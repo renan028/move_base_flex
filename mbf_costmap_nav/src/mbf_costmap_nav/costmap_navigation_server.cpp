@@ -48,6 +48,7 @@
 #include <nav_core_wrapper/wrapper_local_planner.h>
 #include <nav_core_wrapper/wrapper_recovery_behavior.h>
 #include <xmlrpcpp/XmlRpc.h>
+#include <angles/angles.h>
 
 #include "mbf_costmap_nav/footprint_helper.h"
 #include "mbf_costmap_nav/costmap_navigation_server.h"
@@ -886,8 +887,9 @@ bool CostmapNavigationServer::callServiceFindValidPose(mbf_msgs::FindValidPose::
   response.pose.pose.position.y = sol.pose.y;
   response.pose.pose.position.z = 0;
 
-  // if the tolerance is less than the increment, we avoid conversion (avoid floating point error)
-  response.pose.pose.orientation = request.angle_tolerance <= ANGLE_INCREMENT ?
+  // if the difference between solution angle and requested angle is less than ANGLE_INCREMENT,
+  // use the requested one to avoid numerical issues
+  response.pose.pose.orientation = angles::shortest_angular_distance(goal.theta, sol.pose.theta) < ANGLE_INCREMENT ?
                                        request.pose.pose.orientation :
                                        tf::createQuaternionMsgFromYaw(sol.pose.theta);
   response.pose.header.frame_id = costmap_frame;
