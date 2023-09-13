@@ -885,7 +885,11 @@ bool CostmapNavigationServer::callServiceFindValidPose(mbf_msgs::FindValidPose::
   response.pose.pose.position.x = sol.pose.x;
   response.pose.pose.position.y = sol.pose.y;
   response.pose.pose.position.z = 0;
-  response.pose.pose.orientation = tf::createQuaternionMsgFromYaw(sol.pose.theta);
+
+  // if the tolerance is less than the increment, we avoid conversion (avoid floating point error)
+  response.pose.pose.orientation = request.angle_tolerance <= ANGLE_INCREMENT ?
+                                       request.pose.pose.orientation :
+                                       tf::createQuaternionMsgFromYaw(sol.pose.theta);
   response.pose.header.frame_id = costmap_frame;
   response.pose.header.stamp = ros::Time::now();
   response.state = sol.search_state.state;
