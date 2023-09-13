@@ -641,13 +641,13 @@ TEST_F(SearchHelperTest, service_zero_tolerance_test)
   req.pose.header.stamp = ros::Time::now();
   req.pose.pose.position.x = 1.5345;
   req.pose.pose.position.y = 4.666;
-  req.pose.pose.orientation.w = 1;
+  req.pose.pose.orientation = tf::createQuaternionMsgFromYaw(0.001);
 
   ASSERT_TRUE(client.call(req, res));
   EXPECT_EQ(res.state, mbf_msgs::FindValidPose::Response::FREE);
   EXPECT_EQ(res.pose.pose.position.x, 1.5345);
   EXPECT_EQ(res.pose.pose.position.y, 4.666);
-  EXPECT_EQ(tf2::getYaw(res.pose.pose.orientation), 0);
+  EXPECT_EQ(tf2::getYaw(res.pose.pose.orientation), tf2::getYaw(req.pose.pose.orientation));
   server.stop();
 }
 }  // namespace mbf_costmap_nav::test
