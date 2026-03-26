@@ -143,7 +143,7 @@ public:
         // if there is already a plugin running on the same slot, cancel it
         slot_it->second.execution->cancel();
 
-        // TODO + WARNING: this will block the main thread for an arbitrary time during which we won't execute callbacks
+        // WARNING: this will block the main thread for an arbitrary time during which we won't execute callbacks
         if (slot_it->second.thread_ptr->joinable()) {
           slot_it->second.thread_ptr->join();
         }
@@ -198,8 +198,7 @@ public:
     slot.in_use = false;
   }
 
-  virtual void reconfigureAll(
-      mbf_abstract_nav::MoveBaseFlexConfig &config, uint32_t level)
+  virtual void reconfigure(mbf_abstract_nav::MoveBaseFlexConfig& config, uint32_t level)
   {
     boost::lock_guard<boost::mutex> guard(slot_map_mtx_);
 
